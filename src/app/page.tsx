@@ -120,7 +120,7 @@ export default function Home() {
                   <FormItem>
                     <FormLabel>Custom Name</FormLabel>
                     <FormControl>
-                      <div className="flex items-center rounded-md border border-input focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                      <div className="flex items-center rounded-md border border-input focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-2">
                         <span className="text-muted-foreground pl-3 pr-2 py-2 text-sm bg-muted rounded-l-md border-r border-input">{origin.replace('https://', '')}/</span>
                         <Input placeholder="my-magic-link" className="border-0 rounded-l-none focus-visible:ring-0 focus-visible:ring-offset-0" {...field} />
                       </div>
