@@ -65,18 +65,26 @@ export default function Home() {
       if (result.success && result.shortUrl) {
         showSuccessModal(result.shortUrl);
       } else {
-        if (result.error === 'This custom name is already taken.') {
+        const seeLinkSlug = result.error === 'This URL has already been shortened.' ? result.shortUrl : values.slug;
+        const showErrorToast = (description: string, slugToShow: string) => {
             toast({
               variant: 'destructive',
               title: 'Error',
-              description: result.error,
+              description: description,
               action: (
-                <Button variant="outline" size="sm" onClick={() => showSuccessModal(values.slug)} className="bg-white text-black hover:bg-gray-100 hover:text-black">
+                <Button variant="outline" size="sm" onClick={() => showSuccessModal(slugToShow)} className="bg-white text-black hover:bg-gray-100 hover:text-black">
                   See Link
                 </Button>
               ),
             });
-        } else {
+        }
+        
+        if (result.error === 'This custom name is already taken.') {
+            showErrorToast(result.error, values.slug);
+        } else if (result.error === 'This URL has already been shortened.' && result.shortUrl) {
+            showErrorToast(result.error, result.shortUrl);
+        }
+        else {
             toast({
               variant: 'destructive',
               title: 'Error',

@@ -28,6 +28,10 @@ export async function createShortLink(
   const result = await saveLink(slug, url);
 
   if (!result.success) {
+    // Pass the existing slug back to the client if the URL is already taken
+    if (result.error === 'This URL has already been shortened.' && result.existingSlug) {
+      return { success: false, error: result.error, shortUrl: result.existingSlug };
+    }
     return { success: false, error: result.error };
   }
 
