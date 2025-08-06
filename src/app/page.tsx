@@ -24,7 +24,6 @@ import {
 import { createShortLink } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import { Copy, Link as LinkIcon, Wand2 } from 'lucide-react';
-import { useOrigin } from '@/hooks/use-origin';
 import Logo from '@/components/logo';
 
 const formSchema = z.object({
@@ -37,7 +36,7 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const origin = useOrigin();
+  const origin = 'https://shortend-link.vercel.app';
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -122,7 +121,7 @@ export default function Home() {
                     <FormLabel>Custom Name</FormLabel>
                     <FormControl>
                         <div className="flex items-center">
-                            <span className="text-muted-foreground p-2 bg-muted rounded-l-md">{origin}/</span>
+                            <span className="text-muted-foreground p-2 bg-muted rounded-l-md">{origin.replace('https://', '')}/</span>
                             <Input placeholder="my-magic-link" className="rounded-l-none" {...field} />
                         </div>
                     </FormControl>
