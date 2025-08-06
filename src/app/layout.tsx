@@ -18,15 +18,18 @@ const poppins = Poppins({
   variable: '--font-poppins',
 });
 
+const cacheBuster = `?v=${new Date().getTime()}`;
+const iconUrl = `/icon.svg${cacheBuster}`;
+
 export const metadata: Metadata = {
   title: 'Shortened Link - Shorten Your Links',
-  description: 'Generate short, custom-named links that redirect anywhere you want.',
+  description: 'The easiest way to shorten, manage, and track your links.',
   openGraph: {
     title: 'Shortened Link - Shorten Your Links',
     description: 'The easiest way to shorten, manage, and track your links.',
     images: [
       {
-        url: '/icon.svg',
+        url: iconUrl,
         width: 1200,
         height: 630,
         alt: 'Shortened Link Logo',
@@ -37,7 +40,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Shortened Link - Shorten Your Links',
     description: 'The easiest way to shorten, manage, and track your links.',
-    images: ['/icon.svg'],
+    images: [iconUrl],
   },
 };
 
