@@ -52,20 +52,37 @@ export default function Home() {
     },
   });
 
+  function showSuccessModal(shortUrl: string) {
+    setGeneratedLink(`${origin}/${shortUrl}`);
+    setIsModalOpen(true);
+    form.reset();
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
       const result = await createShortLink(values);
       if (result.success && result.shortUrl) {
-        setGeneratedLink(`${origin}/${result.shortUrl}`);
-        setIsModalOpen(true);
-        form.reset();
+        showSuccessModal(result.shortUrl);
       } else {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: result.error || 'Failed to create link.',
-        });
+        if (result.error === 'This custom name is already taken.') {
+            toast({
+              variant: 'destructive',
+              title: 'Error',
+              description: result.error,
+              action: (
+                <Button variant="outline" size="sm" onClick={() => showSuccessModal(values.slug)}>
+                  See Link
+                </Button>
+              ),
+            });
+        } else {
+            toast({
+              variant: 'destructive',
+              title: 'Error',
+              description: result.error || 'Failed to create link.',
+            });
+        }
       }
     } catch (error) {
       toast({
@@ -86,7 +103,7 @@ export default function Home() {
     });
   };
   
-  const displayOrigin = origin || '';
+  const displayOrigin = origin.replace(/^https?:\/\//, '') || '';
 
   return (
     <div className="container mx-auto max-w-2xl py-12 px-4">
@@ -125,7 +142,7 @@ export default function Home() {
                   <FormItem>
                     <FormLabel>Custom Name</FormLabel>
                      <FormDescription className="bg-muted p-2 rounded-md break-words">
-                        Your shortened link will look like this: {displayOrigin}/&lt;your-custom-name&gt;
+                        Your shortened link will look like this: https://{displayOrigin}/&lt;your-custom-name&gt;
                      </FormDescription>
                     <FormControl>
                         <Input placeholder="my-magic-link" {...field} />
