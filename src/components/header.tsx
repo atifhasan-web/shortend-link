@@ -7,7 +7,7 @@ const Header = () => {
     <header className="sticky top-0 z-50 border-b bg-background">
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <Logo className="h-6 w-6 text-primary" />
+          <Logo className="h-6 w-6" />
           <span className="font-headline text-base font-semibold">
             Shortened Link
           </span>
