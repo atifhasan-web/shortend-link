@@ -71,7 +71,7 @@ export default function Home() {
               title: 'Error',
               description: result.error,
               action: (
-                <Button variant="outline" size="sm" onClick={() => showSuccessModal(values.slug)}>
+                <Button variant="outline" size="sm" onClick={() => showSuccessModal(values.slug)} className="bg-white text-black hover:bg-gray-200">
                   See Link
                 </Button>
               ),
