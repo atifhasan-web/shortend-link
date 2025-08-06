@@ -19,8 +19,26 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: 'Shortened Link - Shorten Your Links with Magic',
+  title: 'Link Alchemist - Shorten Your Links with Magic',
   description: 'Generate short, custom-named links that redirect anywhere you want.',
+  openGraph: {
+    title: 'Link Alchemist - Shorten Your Links with Magic',
+    description: 'The easiest way to shorten, manage, and track your links.',
+    images: [
+      {
+        url: '/icon.svg',
+        width: 1200,
+        height: 630,
+        alt: 'Link Alchemist Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Link Alchemist - Shorten Your Links with Magic',
+    description: 'The easiest way to shorten, manage, and track your links.',
+    images: ['/icon.svg'],
+  },
 };
 
 export default function RootLayout({
@@ -31,6 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" sizes="any" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
