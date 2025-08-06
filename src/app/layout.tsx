@@ -22,11 +22,14 @@ const cacheBuster = `?v=${new Date().getTime()}`;
 const iconUrl = `/icon.svg${cacheBuster}`;
 
 export const metadata: Metadata = {
-  title: 'Shortened Link - Shorten Your Links',
-  description: 'The easiest way to shorten, manage, and track your links.',
+  title: 'Shortened Link | Free & Simple URL Shortener',
+  description: 'The easiest way to shorten, manage, and track your links. Create short, memorable, and branded links for free with our powerful and easy-to-use platform.',
+  keywords: ['url shortener', 'link shortener', 'custom url', 'branded links', 'free url shortener', 'link management', 'short links'],
   openGraph: {
-    title: 'Shortened Link - Shorten Your Links',
-    description: 'The easiest way to shorten, manage, and track your links.',
+    title: 'Shortened Link | Free & Simple URL Shortener',
+    description: 'The easiest way to shorten, manage, and track your links. Create short, memorable, and branded links for free.',
+    url: 'https://shortened.link',
+    siteName: 'Shortened Link',
     images: [
       {
         url: iconUrl,
@@ -35,12 +38,25 @@ export const metadata: Metadata = {
         alt: 'Shortened Link Logo',
       },
     ],
+    locale: 'en_US',
+    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Shortened Link - Shorten Your Links',
-    description: 'The easiest way to shorten, manage, and track your links.',
+    title: 'Shortened Link | Free & Simple URL Shortener',
+    description: 'The easiest way to shorten, manage, and track your links. Create short, memorable, and branded links for free.',
     images: [iconUrl],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
