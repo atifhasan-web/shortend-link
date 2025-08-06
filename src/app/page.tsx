@@ -65,31 +65,34 @@ export default function Home() {
       if (result.success && result.shortUrl) {
         showSuccessModal(result.shortUrl);
       } else {
-        const seeLinkSlug = result.error === 'This URL has already been shortened.' ? result.shortUrl : values.slug;
         const showErrorToast = (description: string, slugToShow: string) => {
-            toast({
-              variant: 'destructive',
-              title: 'Error',
-              description: description,
-              action: (
-                <Button variant="outline" size="sm" onClick={() => showSuccessModal(slugToShow)} className="bg-white text-black hover:bg-gray-100 hover:text-black">
-                  See Link
-                </Button>
-              ),
-            });
-        }
-        
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: description,
+            action: (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => showSuccessModal(slugToShow)}
+                className="bg-white text-black hover:bg-gray-100 hover:text-black"
+              >
+                See Link
+              </Button>
+            ),
+          });
+        };
+
         if (result.error === 'This custom name is already taken.') {
-            showErrorToast(result.error, values.slug);
+          showErrorToast(result.error, values.slug);
         } else if (result.error === 'This URL has already been shortened.' && result.shortUrl) {
-            showErrorToast(result.error, result.shortUrl);
-        }
-        else {
-            toast({
-              variant: 'destructive',
-              title: 'Error',
-              description: result.error || 'Failed to create link.',
-            });
+          showErrorToast(result.error, result.shortUrl);
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: result.error || 'Failed to create link.',
+          });
         }
       }
     } catch (error) {
@@ -110,7 +113,7 @@ export default function Home() {
       description: 'The short link has been copied.',
     });
   };
-  
+
   const displayOrigin = origin.replace(/^https?:\/\//, '') || '';
 
   return (
@@ -149,11 +152,11 @@ export default function Home() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Custom Name</FormLabel>
-                     <FormDescription className="bg-muted p-2 rounded-md break-words">
-                        Your shortened link will look like this: https://{displayOrigin}/&lt;your-custom-name&gt;
-                     </FormDescription>
+                    <FormDescription className="bg-muted p-2 rounded-md break-words">
+                      Your shortened link will look like this: https://{displayOrigin}/&lt;your-custom-name&gt;
+                    </FormDescription>
                     <FormControl>
-                        <Input placeholder="my-magic-link" {...field} />
+                      <Input placeholder="my-magic-link" {...field} className="mt-4" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
