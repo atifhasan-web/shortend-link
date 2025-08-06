@@ -125,8 +125,8 @@ export default function Home() {
                     <FormLabel>Custom Name</FormLabel>
                     <FormControl>
                       <div className="flex items-center rounded-md border border-input focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-1">
-                        <span className="flex-shrink-0 truncate bg-muted p-2 text-muted-foreground rounded-l-md border-r border-input text-sm">{displayOrigin}/</span>
-                        <Input placeholder="my-magic-link" className="border-0 rounded-l-none focus-visible:ring-0 focus-visible:ring-offset-0 min-w-0 flex-1" {...field} />
+                        <span className="flex-shrink-0 bg-muted p-2 text-muted-foreground rounded-l-md border-r border-input text-sm truncate">{displayOrigin}/</span>
+                        <Input placeholder="my-magic-link" className="border-0 rounded-l-none focus-visible:ring-0 focus-visible:ring-offset-0 min-w-0 flex-grow" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
