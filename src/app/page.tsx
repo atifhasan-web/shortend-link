@@ -83,9 +83,6 @@ export default function Home() {
   return (
     <div className="container mx-auto max-w-2xl py-12 px-4">
        <div className="flex flex-col items-center justify-center text-center px-4 mb-8">
-        <div className="mb-6">
-          <Logo className="h-24 w-24 text-primary" />
-        </div>
         <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-primary">
           Shortened Link
         </h1>
@@ -120,7 +117,7 @@ export default function Home() {
                   <FormItem>
                     <FormLabel>Custom Name</FormLabel>
                     <FormControl>
-                      <div className="flex items-center rounded-md border border-input focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-2">
+                      <div className="flex items-center rounded-md border border-input focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-1">
                         <span className="text-muted-foreground pl-3 pr-2 py-2 text-sm bg-muted rounded-l-md border-r border-input">{origin.replace('https://', '')}/</span>
                         <Input placeholder="my-magic-link" className="border-0 rounded-l-none focus-visible:ring-0 focus-visible:ring-offset-0" {...field} />
                       </div>

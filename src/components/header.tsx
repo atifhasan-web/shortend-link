@@ -5,10 +5,10 @@ import Logo from './logo';
 const Header = () => {
   return (
     <header className="border-b">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="container mx-auto flex h-14 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <Logo className="h-8 w-8 text-primary" />
-          <span className="font-headline text-lg font-semibold text-primary">
+          <Logo className="h-6 w-6 text-primary" />
+          <span className="font-headline text-base font-semibold text-primary">
             Shortened Link
           </span>
         </Link>
