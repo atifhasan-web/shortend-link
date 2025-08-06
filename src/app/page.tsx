@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -24,7 +24,6 @@ import {
 import { createShortLink } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import { Copy, Link as LinkIcon, Wand2 } from 'lucide-react';
-import Logo from '@/components/logo';
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL.' }),
@@ -35,8 +34,14 @@ export default function Home() {
   const [generatedLink, setGeneratedLink] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [origin, setOrigin] = useState('');
   const { toast } = useToast();
-  const origin = 'https://shortend-link.vercel.app';
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setOrigin(window.location.origin);
+    }
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,6 +84,8 @@ export default function Home() {
       description: 'The short link has been copied.',
     });
   };
+  
+  const displayOrigin = origin ? origin.replace(/^(https?:\/\/)/, '') : '';
 
   return (
     <div className="container mx-auto max-w-2xl py-12 px-4">
@@ -118,7 +125,7 @@ export default function Home() {
                     <FormLabel>Custom Name</FormLabel>
                     <FormControl>
                       <div className="flex items-center rounded-md border border-input focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-1">
-                        <span className="text-muted-foreground pl-3 pr-2 py-2 text-sm bg-muted rounded-l-md border-r border-input">{origin.replace('https://', '')}/</span>
+                        <span className="text-muted-foreground pl-3 pr-2 py-2 text-sm bg-muted rounded-l-md border-r border-input">{displayOrigin}/</span>
                         <Input placeholder="my-magic-link" className="border-0 rounded-l-none focus-visible:ring-0 focus-visible:ring-offset-0" {...field} />
                       </div>
                     </FormControl>
