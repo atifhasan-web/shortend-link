@@ -12,6 +12,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -123,11 +124,11 @@ export default function Home() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Custom Name</FormLabel>
+                     <FormDescription className="bg-muted p-2 rounded-md break-words">
+                        Your shortened link will look like this: {displayOrigin}/&lt;your-custom-name&gt;
+                     </FormDescription>
                     <FormControl>
-                      <div className="flex items-center rounded-md border border-input focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-1">
-                        <span className="flex-shrink-0 bg-muted p-2 text-muted-foreground rounded-l-md border-r border-input text-sm truncate">{displayOrigin}/</span>
-                        <Input placeholder="my-magic-link" className="border-0 rounded-l-none focus-visible:ring-0 focus-visible:ring-offset-0 min-w-0 flex-grow" {...field} />
-                      </div>
+                        <Input placeholder="my-magic-link" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
