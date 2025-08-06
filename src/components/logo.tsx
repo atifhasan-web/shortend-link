@@ -11,13 +11,11 @@ const Logo = ({ className }: { className?: string }) => {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={cn('lucide lucide-flask-conical', className)}
+      className={cn('lucide lucide-link-2', className)}
     >
-      <path d="M10.2 2.2c.2-.4.6-.6 1-.6s.8.2 1 .6l6.8 11.6c.2.4.2.8 0 1.2s-.6.6-1 .6H4.2c-.4 0-.8-.2-1-.6s-.2-.8 0-1.2L10.2 2.2Z" />
-      <path d="M8.5 14h7" />
-      <path d="M7 17h10" />
-      <path d="M8.5 20h7" />
-      <path d="M12 14v6" />
+      <path d="M9 17H7A5 5 0 0 1 7 7h2" />
+      <path d="M15 7h2a5 5 0 1 1 0 10h-2" />
+      <line x1="8" x2="16" y1="12" y2="12" />
     </svg>
   );
 };
