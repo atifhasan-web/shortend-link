@@ -19,23 +19,23 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: 'Link Alchemist - Shorten Your Links with Magic',
+  title: 'Shortened Link - Shorten Your Links',
   description: 'Generate short, custom-named links that redirect anywhere you want.',
   openGraph: {
-    title: 'Link Alchemist - Shorten Your Links with Magic',
+    title: 'Shortened Link - Shorten Your Links',
     description: 'The easiest way to shorten, manage, and track your links.',
     images: [
       {
         url: '/icon.svg',
         width: 1200,
         height: 630,
-        alt: 'Link Alchemist Logo',
+        alt: 'Shortened Link Logo',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Link Alchemist - Shorten Your Links with Magic',
+    title: 'Shortened Link - Shorten Your Links',
     description: 'The easiest way to shorten, manage, and track your links.',
     images: ['/icon.svg'],
   },

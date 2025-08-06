@@ -90,8 +90,8 @@ export default function Home() {
   return (
     <div className="container mx-auto max-w-2xl py-12 px-4">
        <div className="flex flex-col items-center justify-center text-center px-4 mb-8">
-        <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-primary">
-          Link Alchemist
+        <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tighter mb-4">
+          Shortened Link
         </h1>
         <p className="max-w-2xl text-lg md:text-xl text-muted-foreground">
           Transform your long, unwieldy URLs into short, memorable links. Create your magic link and share it with the world.
