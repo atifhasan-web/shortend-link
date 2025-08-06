@@ -86,7 +86,7 @@ export default function Home() {
     });
   };
   
-  const displayOrigin = origin ? origin.replace(/^(https?:\/\/)/, '') : '';
+  const displayOrigin = origin || '';
 
   return (
     <div className="container mx-auto max-w-2xl py-12 px-4">
