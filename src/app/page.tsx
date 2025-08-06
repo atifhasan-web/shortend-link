@@ -10,7 +10,7 @@ export default function Home() {
         <Logo className="h-24 w-24 text-primary" />
       </div>
       <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-primary">
-        Link Alchemist
+        Shortened Link
       </h1>
       <p className="max-w-2xl text-lg md:text-xl text-muted-foreground mb-8">
         Transform your long, unwieldy URLs into short, memorable links. Create your magic link and share it with the world.

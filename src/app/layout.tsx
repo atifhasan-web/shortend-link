@@ -19,7 +19,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: 'Link Alchemist - Shorten Your Links with Magic',
+  title: 'Shortened Link - Shorten Your Links with Magic',
   description: 'Generate short, custom-named links that redirect anywhere you want.',
 };
 

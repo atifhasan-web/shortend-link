@@ -9,7 +9,7 @@ const Header = () => {
         <Link href="/" className="flex items-center gap-2">
           <Logo className="h-8 w-8 text-primary" />
           <span className="font-headline text-lg font-semibold text-primary">
-            Link Alchemist
+            Shortened Link
           </span>
         </Link>
         <ThemeToggle />
