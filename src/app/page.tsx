@@ -28,6 +28,7 @@ import { createShortLink, updateLink } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import { Copy, Link as LinkIcon, Wand2, ClipboardPaste } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ToastAction } from '@/components/ui/toast';
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL.' }),
@@ -149,26 +150,25 @@ export default function Home() {
             toast({
               variant: 'destructive',
               title: 'Error',
-              description: result.error,
-              action: (
-                <div className="flex flex-col gap-2 w-full">
-                  <Button
-                    variant="outline"
-                    size="sm"
+              description: (
+                <div className="flex flex-col">
+                  <span>{result.error}</span>
+                  <button
                     onClick={() => openManageModal(values.slug, values.url)}
-                    className="bg-white text-black hover:bg-gray-100 hover:text-black w-full"
+                    className="text-sm underline text-white hover:text-gray-200 text-left mt-2 cursor-pointer"
                   >
                     Manage Link
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => showSuccessModal(values.slug)}
-                    className="bg-white text-black hover:bg-gray-100 hover:text-black w-full"
-                  >
-                    See Link
-                  </Button>
+                  </button>
                 </div>
+              ),
+              action: (
+                <ToastAction
+                  altText="See Link"
+                  onClick={() => showSuccessModal(values.slug)}
+                  className="bg-white text-black hover:bg-gray-100 hover:text-black"
+                >
+                  See Link
+                </ToastAction>
               ),
             });
         } else if (result.error === 'This URL has already been shortened.' && result.shortUrl) {
