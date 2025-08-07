@@ -238,7 +238,7 @@ export default function Home() {
                      <ToastAction
                       altText="See Link"
                       onClick={() => showSuccessModal(values.slug)}
-                      className="bg-white text-black hover:bg-gray-200"
+                      className="bg-white text-black hover:bg-black hover:text-white"
                     >
                       See Link
                     </ToastAction>
@@ -262,7 +262,7 @@ export default function Home() {
                 variant="outline"
                 size="sm"
                 onClick={() => showSuccessModal(result.shortUrl!)}
-                 className="bg-white text-black hover:bg-gray-200"
+                 className="bg-white text-black hover:bg-black hover:text-white"
               >
                 See Link
               </Button>
