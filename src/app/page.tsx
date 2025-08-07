@@ -175,7 +175,7 @@ export default function Home() {
             ),
           });
         } else if (result.error === 'This URL has already been shortened.' && result.shortUrl) {
-          toast({
+           toast({
             variant: 'destructive',
             title: 'Error',
             description: result.error,
@@ -308,28 +308,7 @@ export default function Home() {
               The custom name <span className="font-bold text-primary">{slugToManage}</span> is already taken. You can update the long URL it points to.
             </p>
 
-            {isAdminAuthenticated ? (
-              <Form {...updateForm}>
-                <form onSubmit={updateForm.handleSubmit(onUpdateSubmit)} className="space-y-4">
-                  <FormField
-                    control={updateForm.control}
-                    name="url"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>New Long URL</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://your-new-long-url.com/goes-here" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full" disabled={isUpdating}>
-                    {isUpdating ? 'Updating...' : 'Update and Save Link'}
-                  </Button>
-                </form>
-              </Form>
-            ) : (
+            {!isAdminAuthenticated ? (
               <Form {...adminAuthForm}>
                  {authError && (
                     <Alert variant="destructive">
@@ -366,6 +345,27 @@ export default function Home() {
                   />
                   <Button type="submit" className="w-full">
                     Authenticate
+                  </Button>
+                </form>
+              </Form>
+            ) : (
+              <Form {...updateForm}>
+                <form onSubmit={updateForm.handleSubmit(onUpdateSubmit)} className="space-y-4">
+                  <FormField
+                    control={updateForm.control}
+                    name="url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>New Long URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://your-new-long-url.com/goes-here" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full" disabled={isUpdating}>
+                    {isUpdating ? 'Updating...' : 'Update and Save Link'}
                   </Button>
                 </form>
               </Form>
