@@ -24,7 +24,8 @@ import {
 } from '@/components/ui/dialog';
 import { createShortLink, updateLink } from './actions';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Link as LinkIcon, Wand2, Edit } from 'lucide-react';
+import { Copy, Link as LinkIcon, Wand2 } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL.' }),
@@ -35,16 +36,25 @@ const updateFormSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL.' }),
 });
 
+const adminAuthSchema = z.object({
+  username: z.string().min(1, { message: 'Username is required.' }),
+  password: z.string().min(1, { message: 'Password is required.' }),
+});
+
 export default function Home() {
   const [generatedLink, setGeneratedLink] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [slugToManage, setSlugToManage] = useState('');
-  const [newUrl, setNewUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [origin, setOrigin] = useState('');
   const { toast } = useToast();
+
+  // Admin auth state
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [authError, setAuthError] = useState('');
+
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -67,6 +77,15 @@ export default function Home() {
     },
   });
 
+  const adminAuthForm = useForm<z.infer<typeof adminAuthSchema>>({
+    resolver: zodResolver(adminAuthSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+    }
+  });
+
+
   function showSuccessModal(shortUrl: string) {
     setGeneratedLink(`${origin}/${shortUrl}`);
     setIsModalOpen(true);
@@ -75,10 +94,32 @@ export default function Home() {
   
   function openManageModal(slug: string) {
     setSlugToManage(slug);
+    setIsAdminAuthenticated(false); // Reset auth state on open
+    setAuthError('');
+    adminAuthForm.reset();
+    updateForm.reset();
     setIsManageModalOpen(true);
   }
 
+  async function onAdminAuthSubmit(values: z.infer<typeof adminAuthSchema>) {
+    if (values.username === 'fahim' && values.password === 'fahim') {
+      setIsAdminAuthenticated(true);
+      setAuthError('');
+    } else {
+      setAuthError('Invalid credentials. Only admins can manage links.');
+      setIsAdminAuthenticated(false);
+    }
+  }
+
   async function onUpdateSubmit(values: z.infer<typeof updateFormSchema>) {
+    if (!isAdminAuthenticated) {
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Error',
+        description: 'You must be authenticated to update a link.',
+      });
+      return;
+    }
     setIsUpdating(true);
     try {
       const result = await updateLink(slugToManage, values.url);
@@ -175,8 +216,6 @@ export default function Home() {
     });
   };
 
-  const displayOrigin = origin.replace(/^https?:\/\//, '') || '';
-
   return (
     <div className="container mx-auto max-w-2xl py-12 px-4">
        <div className="flex flex-col items-center justify-center text-center px-4 mb-8">
@@ -267,26 +306,69 @@ export default function Home() {
             <p className="text-center text-muted-foreground">
               The custom name <span className="font-bold text-primary">{slugToManage}</span> is already taken. You can update the long URL it points to.
             </p>
-            <Form {...updateForm}>
-              <form onSubmit={updateForm.handleSubmit(onUpdateSubmit)} className="space-y-4">
-                 <FormField
-                  control={updateForm.control}
-                  name="url"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>New Long URL</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://your-new-long-url.com/goes-here" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+
+            {isAdminAuthenticated ? (
+              <Form {...updateForm}>
+                <form onSubmit={updateForm.handleSubmit(onUpdateSubmit)} className="space-y-4">
+                  <FormField
+                    control={updateForm.control}
+                    name="url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>New Long URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://your-new-long-url.com/goes-here" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full" disabled={isUpdating}>
+                    {isUpdating ? 'Updating...' : 'Update and Save Link'}
+                  </Button>
+                </form>
+              </Form>
+            ) : (
+              <Form {...adminAuthForm}>
+                 {authError && (
+                    <Alert variant="destructive">
+                      <AlertTitle>Authentication Failed</AlertTitle>
+                      <AlertDescription>{authError}</AlertDescription>
+                    </Alert>
                   )}
-                />
-                <Button type="submit" className="w-full" disabled={isUpdating}>
-                  {isUpdating ? 'Updating...' : 'Update and Save Link'}
-                </Button>
-              </form>
-            </Form>
+                <form onSubmit={adminAuthForm.handleSubmit(onAdminAuthSubmit)} className="space-y-4">
+                  <FormField
+                    control={adminAuthForm.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Admin Username</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter admin username" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                   <FormField
+                    control={adminAuthForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Admin Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="Enter admin password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full">
+                    Authenticate
+                  </Button>
+                </form>
+              </Form>
+            )}
           </div>
         </DialogContent>
       </Dialog>
