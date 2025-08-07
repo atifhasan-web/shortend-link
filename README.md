@@ -36,8 +36,8 @@ To get a local copy up and running, follow these simple steps.
 
 1.  **Clone the repository:**
     ```sh
-    git clone https://github.com/your-github-username/your-repo-name.git
-    cd your-repo-name
+    git clone https://github.com/atifhasan-web/shortend-link.git
+    cd shortend-link
     ```
 2.  **Install dependencies:**
     ```sh
