@@ -22,6 +22,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from '@/components/ui/dialog';
 import { createShortLink, updateLink } from './actions';
 import { useToast } from '@/hooks/use-toast';
@@ -37,6 +38,7 @@ const adminAuthSchema = z.object({
   username: z.string().min(1, { message: 'Username is required.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
 });
+
 
 export default function Home() {
   const [generatedLink, setGeneratedLink] = useState('');
@@ -149,14 +151,24 @@ export default function Home() {
               title: 'Error',
               description: result.error,
               action: (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => showSuccessModal(values.slug)}
-                  className="bg-white text-black hover:bg-gray-100 hover:text-black"
-                >
-                  See Link
-                </Button>
+                <div className="flex flex-col gap-2 w-full">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openManageModal(values.slug, values.url)}
+                    className="bg-white text-black hover:bg-gray-100 hover:text-black w-full"
+                  >
+                    Manage Link
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => showSuccessModal(values.slug)}
+                    className="bg-white text-black hover:bg-gray-100 hover:text-black w-full"
+                  >
+                    See Link
+                  </Button>
+                </div>
               ),
             });
         } else if (result.error === 'This URL has already been shortened.' && result.shortUrl) {
