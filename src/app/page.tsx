@@ -265,7 +265,7 @@ export default function Home() {
                     <FormControl>
                        <div className="flex w-full items-center gap-2">
                         <Input placeholder="https://your-very-long-url.com/goes-here" {...field} />
-                        <Button type="button" size="icon" variant="ghost" onClick={handlePaste} className="shrink-0">
+                        <Button type="button" size="icon" onClick={handlePaste} className="shrink-0">
                           <ClipboardPaste className="h-4 w-4" />
                           <span className="sr-only">Paste from clipboard</span>
                         </Button>
