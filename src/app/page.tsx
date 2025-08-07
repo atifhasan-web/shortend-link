@@ -25,16 +25,12 @@ import {
 } from '@/components/ui/dialog';
 import { createShortLink, updateLink } from './actions';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Link as LinkIcon, Wand2, Clipboard } from 'lucide-react';
+import { Copy, Link as LinkIcon, Wand2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL.' }),
   slug: z.string().min(3, { message: 'Custom name must be at least 3 characters.' }).regex(/^[a-zA-Z0-9_-]+$/, { message: 'Only letters, numbers, hyphens, and underscores are allowed.' }),
-});
-
-const updateFormSchema = z.object({
-  url: z.string().url({ message: 'Please enter a valid URL.' }),
 });
 
 const adminAuthSchema = z.object({
@@ -47,6 +43,7 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [slugToManage, setSlugToManage] = useState('');
+  const [urlToUpdate, setUrlToUpdate] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [origin, setOrigin] = useState('');
@@ -70,13 +67,6 @@ export default function Home() {
     },
   });
 
-  const updateForm = useForm<z.infer<typeof updateFormSchema>>({
-    resolver: zodResolver(updateFormSchema),
-    defaultValues: {
-      url: '',
-    },
-  });
-
   const adminAuthForm = useForm<z.infer<typeof adminAuthSchema>>({
     resolver: zodResolver(adminAuthSchema),
     defaultValues: {
@@ -92,12 +82,12 @@ export default function Home() {
     form.reset();
   }
   
-  function openManageModal(slug: string) {
+  function openManageModal(slug: string, url: string) {
     setSlugToManage(slug);
+    setUrlToUpdate(url);
     setIsAdminAuthenticated(false);
     setAuthError('');
     adminAuthForm.reset();
-    updateForm.reset({ url: '' });
     setIsManageModalOpen(true);
   }
 
@@ -106,26 +96,18 @@ export default function Home() {
     if (values.username === 'fahim' && values.password === 'fahim') {
       setIsAdminAuthenticated(true);
       setAuthError('');
-      // Explicitly reset the update form here to ensure it's clean for the next step
-      updateForm.reset({ url: '' });
+      // Automatically trigger the update
+      await handleAutoUpdate();
     } else {
       setAuthError('Invalid credentials. Only admins can manage links.');
       setIsAdminAuthenticated(false);
     }
   }
 
-  async function onUpdateSubmit(values: z.infer<typeof updateFormSchema>) {
-    if (!isAdminAuthenticated) {
-      toast({
-        variant: 'destructive',
-        title: 'Authentication Error',
-        description: 'You must be authenticated to update a link.',
-      });
-      return;
-    }
+  async function handleAutoUpdate() {
     setIsUpdating(true);
     try {
-      const result = await updateLink(slugToManage, values.url);
+      const result = await updateLink(slugToManage, urlToUpdate);
       if (result.success && result.shortUrl) {
         setIsManageModalOpen(false);
         showSuccessModal(result.shortUrl);
@@ -139,6 +121,7 @@ export default function Home() {
           title: 'Error',
           description: result.error || 'Failed to update link.',
         });
+         setIsManageModalOpen(false); // Close modal on failure too
       }
     } catch (error) {
        toast({
@@ -146,6 +129,7 @@ export default function Home() {
         title: 'Oh no! Something went wrong.',
         description: 'There was a problem with your request.',
       });
+       setIsManageModalOpen(false);
     } finally {
       setIsUpdating(false);
     }
@@ -167,7 +151,7 @@ export default function Home() {
               <div>
                 <p>{result.error}</p>
                 <button
-                  onClick={() => openManageModal(values.slug)}
+                  onClick={() => openManageModal(values.slug, values.url)}
                   className="mt-2 text-sm underline text-white hover:text-gray-200"
                 >
                   Manage this link instead?
@@ -217,20 +201,6 @@ export default function Home() {
       description: 'The short link has been copied.',
     });
   };
-
-  const handlePaste = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      updateForm.setValue('url', text, { shouldValidate: true });
-    } catch (err) {
-      toast({
-        variant: 'destructive',
-        title: 'Paste Failed',
-        description: 'Could not read from clipboard. Please paste manually.',
-      });
-    }
-  };
-
 
   return (
     <div className="container mx-auto max-w-2xl py-12 px-4">
@@ -316,13 +286,12 @@ export default function Home() {
       <Dialog open={isManageModalOpen} onOpenChange={setIsManageModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-headline text-center">Update Link</DialogTitle>
+            <DialogTitle className="font-headline text-center">Manage Link</DialogTitle>
           </DialogHeader>
           <div className="mt-4 flex flex-col gap-4">
-            {!isAdminAuthenticated ? (
               <>
                 <p className="text-center text-muted-foreground">
-                  The custom name <span className="font-bold text-primary">{slugToManage}</span> is already taken. Please authenticate to manage it.
+                  The custom name <span className="font-bold text-primary">{slugToManage}</span> is already taken. Please authenticate to update the URL it points to.
                 </p>
                 <Form {...adminAuthForm}>
                   {authError && (
@@ -358,51 +327,15 @@ export default function Home() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full">
-                      Authenticate
-                    </Button>
-                  </form>
-                </Form>
-              </>
-            ) : (
-              <>
-                <p className="text-center text-muted-foreground">
-                  Authenticated! You can now update the URL for{' '}
-                  <span className="font-bold text-primary">{slugToManage}</span>.
-                </p>
-                 <Form {...updateForm}>
-                  <form onSubmit={updateForm.handleSubmit(onUpdateSubmit)} className="space-y-4">
-                    <FormField
-                      control={updateForm.control}
-                      name="url"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>New Long URL</FormLabel>
-                          <div className="flex items-center gap-2">
-                            <FormControl>
-                              <Input placeholder="https://your-new-long-url.com" {...field} />
-                            </FormControl>
-                            <Button type="button" variant="outline" size="icon" onClick={handlePaste}>
-                              <Clipboard className="h-4 w-4" />
-                              <span className="sr-only">Paste from clipboard</span>
-                            </Button>
-                          </div>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                     <Button type="submit" className="w-full" disabled={isUpdating}>
-                      {isUpdating ? 'Updating...' : 'Update and Save Link'}
+                      {isUpdating ? 'Updating...' : 'Authenticate and Update'}
                     </Button>
                   </form>
                 </Form>
               </>
-            )}
           </div>
         </DialogContent>
       </Dialog>
     </div>
   );
 }
-
-    
