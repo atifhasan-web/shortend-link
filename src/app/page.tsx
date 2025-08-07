@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import { createShortLink, updateLink } from './actions';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Link as LinkIcon, Wand2 } from 'lucide-react';
+import { Copy, Link as LinkIcon, Wand2, ClipboardPaste } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const formSchema = z.object({
@@ -202,6 +202,22 @@ export default function Home() {
     });
   };
 
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      form.setValue('url', text);
+      toast({
+        title: 'Pasted from clipboard!',
+      });
+    } catch (err) {
+      toast({
+        variant: 'destructive',
+        title: 'Failed to paste',
+        description: 'Could not read from clipboard. Please check permissions.',
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto max-w-2xl py-12 px-4">
        <div className="flex flex-col items-center justify-center text-center px-4 mb-8">
@@ -226,7 +242,13 @@ export default function Home() {
                   <FormItem>
                     <FormLabel>Long URL</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://your-very-long-url.com/goes-here" {...field} />
+                      <div className="flex items-center space-x-2">
+                        <Input placeholder="https://your-very-long-url.com/goes-here" {...field} />
+                        <Button type="button" size="icon" variant="outline" onClick={handlePaste}>
+                          <ClipboardPaste className="h-4 w-4" />
+                          <span className="sr-only">Paste from clipboard</span>
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
