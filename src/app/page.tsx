@@ -105,7 +105,8 @@ export default function Home() {
     if (values.username === 'fahim' && values.password === 'fahim') {
       setIsAdminAuthenticated(true);
       setAuthError('');
-      updateForm.reset(); // Reset the update form on successful auth
+      // Explicitly reset the update form here to ensure it's clean
+      updateForm.reset({ url: '' });
     } else {
       setAuthError('Invalid credentials. Only admins can manage links.');
       setIsAdminAuthenticated(false);
