@@ -315,17 +315,14 @@ export default function Home() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Custom Name</TableHead>
-                  <TableHead>Original URL</TableHead>
                   <TableHead className="text-right">Short Link</TableHead>
+                  <TableHead>Original URL</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {linkHistory.map((link) => (
                   <TableRow key={link.slug}>
                     <TableCell className="font-medium">{link.slug}</TableCell>
-                    <TableCell className="max-w-xs truncate">
-                      <a href={link.url} target="_blank" rel="noopener noreferrer" className="hover:underline">{link.url}</a>
-                    </TableCell>
                     <TableCell className="text-right">
                        <div className="flex items-center justify-end gap-2">
                         <a href={`${origin}/${link.slug}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{`${origin}/${link.slug}`}</a>
@@ -333,6 +330,9 @@ export default function Home() {
                           <Copy className="h-4 w-4" />
                         </Button>
                       </div>
+                    </TableCell>
+                    <TableCell className="max-w-xs truncate">
+                      <a href={link.url} target="_blank" rel="noopener noreferrer" className="hover:underline">{link.url}</a>
                     </TableCell>
                   </TableRow>
                 ))}
