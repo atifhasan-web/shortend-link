@@ -162,7 +162,7 @@ export default function Home() {
               description: (
                 <div className="flex flex-col items-start gap-2">
                   <span>{result.error}</span>
-                  <div className="flex gap-4">
+                  <div className="flex flex-col gap-2 items-start mt-2">
                     <button
                       onClick={() => openManageModal(values.slug, values.url)}
                       className="text-sm underline text-white hover:text-gray-200 text-left cursor-pointer"
