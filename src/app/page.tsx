@@ -75,6 +75,10 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setOrigin(window.location.origin);
+      // Check for persisted admin state
+      if (sessionStorage.getItem('isAdmin') === 'true') {
+        setIsAdmin(true);
+      }
     }
     fetchHistory();
   }, []);
@@ -125,6 +129,7 @@ export default function Home() {
     if (values.username === 'fahim' && values.password === 'fahim') {
       setIsAdminAuthenticated(true);
       setIsAdmin(true); // Set global admin state
+      sessionStorage.setItem('isAdmin', 'true'); // Persist admin state
       setAuthError('');
       // Automatically trigger the update
       await handleAutoUpdate();
@@ -202,7 +207,7 @@ export default function Home() {
               description: (
                 <div className="flex flex-col items-start gap-2">
                   <span>{result.error}</span>
-                  <div className="flex flex-row gap-2 items-center mt-2">
+                  <div className="flex flex-row items-center justify-between mt-2 w-full">
                      <ToastAction
                       altText="See Link"
                       onClick={() => showSuccessModal(values.slug)}
