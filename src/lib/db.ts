@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, doc, getDoc, setDoc, query, where, getDocs, limit } from 'firebase/firestore';
+import { collection, doc, getDoc, setDoc, query, where, getDocs, limit, updateDoc } from 'firebase/firestore';
 
 const linksCollection = collection(db, 'links');
 
@@ -16,10 +16,6 @@ export async function saveLink(slug: string, url: string): Promise<SaveLinkResul
     const slugDocSnap = await getDoc(slugDocRef);
 
     if (slugDocSnap.exists()) {
-      // If the slug is taken, check if it's for the same URL.
-      if (slugDocSnap.data().url === url) {
-        return { success: true }; // Already exists, treat as success.
-      }
       return { success: false, error: 'This custom name is already taken.' };
     }
 
@@ -36,7 +32,6 @@ export async function saveLink(slug: string, url: string): Promise<SaveLinkResul
       };
     }
 
-    // If neither slug nor URL exists, create the new link.
     await setDoc(slugDocRef, { url });
     console.log(`Saved: ${slug} -> ${url}`);
     return { success: true };
@@ -45,6 +40,41 @@ export async function saveLink(slug: string, url: string): Promise<SaveLinkResul
     return { success: false, error: 'An error occurred while saving the link.' };
   }
 }
+
+type UpdateLinkResult = {
+  success: boolean;
+  error?: string;
+};
+
+export async function updateExistingLink(slug: string, newUrl: string): Promise<UpdateLinkResult> {
+  try {
+    const slugDocRef = doc(db, 'links', slug);
+    
+    // Optional: Check if the new URL is already shortened with another slug
+    const urlQuery = query(linksCollection, where('url', '==', newUrl), limit(1));
+    const urlQuerySnapshot = await getDocs(urlQuery);
+    if (!urlQuerySnapshot.empty) {
+        const existingDoc = urlQuerySnapshot.docs[0];
+        if (existingDoc.id !== slug) {
+            return {
+                success: false,
+                error: `This URL is already linked to the custom name: ${existingDoc.id}`,
+            };
+        }
+    }
+    
+    await updateDoc(slugDocRef, { url: newUrl });
+    console.log(`Updated: ${slug} -> ${newUrl}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating link: ", error);
+    if ((error as any).code === 'not-found') {
+       return { success: false, error: 'This custom name does not exist.' };
+    }
+    return { success: false, error: 'An error occurred while updating the link.' };
+  }
+}
+
 
 export async function getLink(slug: string): Promise<string | null> {
   try {

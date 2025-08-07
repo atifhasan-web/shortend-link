@@ -22,19 +22,27 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { createShortLink } from './actions';
+import { createShortLink, updateLink } from './actions';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Link as LinkIcon, Wand2 } from 'lucide-react';
+import { Copy, Link as LinkIcon, Wand2, Edit } from 'lucide-react';
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL.' }),
   slug: z.string().min(3, { message: 'Custom name must be at least 3 characters.' }).regex(/^[a-zA-Z0-9_-]+$/, { message: 'Only letters, numbers, hyphens, and underscores are allowed.' }),
 });
 
+const updateFormSchema = z.object({
+  url: z.string().url({ message: 'Please enter a valid URL.' }),
+});
+
 export default function Home() {
   const [generatedLink, setGeneratedLink] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isManageModalOpen, setIsManageModalOpen] = useState(false);
+  const [slugToManage, setSlugToManage] = useState('');
+  const [newUrl, setNewUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [origin, setOrigin] = useState('');
   const { toast } = useToast();
 
@@ -52,11 +60,54 @@ export default function Home() {
     },
   });
 
+  const updateForm = useForm<z.infer<typeof updateFormSchema>>({
+    resolver: zodResolver(updateFormSchema),
+    defaultValues: {
+      url: '',
+    },
+  });
+
   function showSuccessModal(shortUrl: string) {
     setGeneratedLink(`${origin}/${shortUrl}`);
     setIsModalOpen(true);
     form.reset();
   }
+  
+  function openManageModal(slug: string) {
+    setSlugToManage(slug);
+    setIsManageModalOpen(true);
+  }
+
+  async function onUpdateSubmit(values: z.infer<typeof updateFormSchema>) {
+    setIsUpdating(true);
+    try {
+      const result = await updateLink(slugToManage, values.url);
+      if (result.success && result.shortUrl) {
+        setIsManageModalOpen(false);
+        showSuccessModal(result.shortUrl);
+        updateForm.reset();
+        toast({
+          title: 'Success!',
+          description: 'The link has been updated successfully.',
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: result.error || 'Failed to update link.',
+        });
+      }
+    } catch (error) {
+       toast({
+        variant: 'destructive',
+        title: 'Oh no! Something went wrong.',
+        description: 'There was a problem with your request.',
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  }
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -65,28 +116,39 @@ export default function Home() {
       if (result.success && result.shortUrl) {
         showSuccessModal(result.shortUrl);
       } else {
-        const showErrorToast = (description: string, slugToShow: string) => {
+        if (result.error === 'This custom name is already taken.') {
           toast({
             variant: 'destructive',
             title: 'Error',
-            description: description,
+            description: result.error,
             action: (
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => showSuccessModal(slugToShow)}
+                onClick={() => openManageModal(values.slug)}
+                className="bg-white text-black hover:bg-gray-100 hover:text-black"
+              >
+                <Edit className="mr-2 h-4 w-4"/>
+                Manage Link
+              </Button>
+            ),
+          });
+        } else if (result.error === 'This URL has already been shortened.' && result.shortUrl) {
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: result.error,
+            action: (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => showSuccessModal(result.shortUrl!)}
                 className="bg-white text-black hover:bg-gray-100 hover:text-black"
               >
                 See Link
               </Button>
             ),
           });
-        };
-
-        if (result.error === 'This custom name is already taken.') {
-          showErrorToast(result.error, values.slug);
-        } else if (result.error === 'This URL has already been shortened.' && result.shortUrl) {
-          showErrorToast(result.error, result.shortUrl);
         } else {
           toast({
             variant: 'destructive',
@@ -153,7 +215,7 @@ export default function Home() {
                   <FormItem>
                     <FormLabel>Custom Name</FormLabel>
                     <FormDescription className="bg-muted p-2 rounded-md break-words">
-                      Your shortened link will look like this: https://{displayOrigin}/&lt;your-custom-name&gt;
+                      Your shortened link will look like this: {origin}/&lt;your-custom-name&gt;
                     </FormDescription>
                     <FormControl>
                       <Input placeholder="my-magic-link" {...field} className="mt-4" />
@@ -171,6 +233,7 @@ export default function Home() {
         </CardContent>
       </Card>
 
+      {/* Success Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>
@@ -191,6 +254,40 @@ export default function Home() {
                 Test Link <LinkIcon className="ml-2 h-4 w-4" />
               </a>
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Manage Name Modal */}
+      <Dialog open={isManageModalOpen} onOpenChange={setIsManageModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="font-headline text-center">Update Link</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4 flex flex-col gap-4">
+            <p className="text-center text-muted-foreground">
+              The custom name <span className="font-bold text-primary">{slugToManage}</span> is already taken. You can update the long URL it points to.
+            </p>
+            <Form {...updateForm}>
+              <form onSubmit={updateForm.handleSubmit(onUpdateSubmit)} className="space-y-4">
+                 <FormField
+                  control={updateForm.control}
+                  name="url"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>New Long URL</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://your-new-long-url.com/goes-here" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full" disabled={isUpdating}>
+                  {isUpdating ? 'Updating...' : 'Update and Save Link'}
+                </Button>
+              </form>
+            </Form>
           </div>
         </DialogContent>
       </Dialog>

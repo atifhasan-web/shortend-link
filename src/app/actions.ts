@@ -1,7 +1,7 @@
 'use server';
 
 import * as z from 'zod';
-import { saveLink } from '@/lib/db';
+import { saveLink, updateExistingLink } from '@/lib/db';
 
 const formSchema = z.object({
   url: z.string().url(),
@@ -28,7 +28,6 @@ export async function createShortLink(
   const result = await saveLink(slug, url);
 
   if (!result.success) {
-    // Pass the existing slug back to the client if the URL is already taken
     if (result.error === 'This URL has already been shortened.' && result.existingSlug) {
       return { success: false, error: result.error, shortUrl: result.existingSlug };
     }
@@ -37,3 +36,25 @@ export async function createShortLink(
 
   return { success: true, shortUrl: slug };
 }
+
+
+const updateFormSchema = z.object({
+  url: z.string().url(),
+});
+
+export async function updateLink(slug: string, newUrl: string): Promise<CreateShortLinkResult> {
+  const validatedFields = updateFormSchema.safeParse({ url: newUrl });
+
+  if (!validatedFields.success) {
+    return { success: false, error: 'Invalid URL format.' };
+  }
+
+  const result = await updateExistingLink(slug, newUrl);
+
+  if (!result.success) {
+    return { success: false, error: result.error };
+  }
+
+  return { success: true, shortUrl: slug };
+}
+
