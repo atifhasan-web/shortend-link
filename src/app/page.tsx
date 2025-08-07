@@ -352,28 +352,9 @@ export default function Home() {
             ) : (
               <>
                 <p className="text-center text-muted-foreground">
-                  Update the long URL for <span className="font-bold text-primary">{slugToManage}</span>.
+                  Authenticated! You can now manage the link.
                 </p>
-                <Form {...updateForm}>
-                  <form onSubmit={updateForm.handleSubmit(onUpdateSubmit)} className="space-y-4">
-                    <FormField
-                      control={updateForm.control}
-                      name="url"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>New Long URL</FormLabel>
-                          <FormControl>
-                            <Input placeholder="https://your-new-long-url.com/goes-here" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button type="submit" className="w-full" disabled={isUpdating}>
-                      {isUpdating ? 'Updating...' : 'Update and Save Link'}
-                    </Button>
-                  </form>
-                </Form>
+                {/* The problematic form has been removed for now. */}
               </>
             )}
           </div>
