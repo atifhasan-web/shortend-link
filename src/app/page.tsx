@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/dialog';
 import { createShortLink, updateLink } from './actions';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Link as LinkIcon, Wand2 } from 'lucide-react';
+import { Copy, Link as LinkIcon, Wand2, Clipboard } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const formSchema = z.object({
@@ -217,6 +217,20 @@ export default function Home() {
     });
   };
 
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      updateForm.setValue('url', text, { shouldValidate: true });
+    } catch (err) {
+      toast({
+        variant: 'destructive',
+        title: 'Paste Failed',
+        description: 'Could not read from clipboard. Please paste manually.',
+      });
+    }
+  };
+
+
   return (
     <div className="container mx-auto max-w-2xl py-12 px-4">
        <div className="flex flex-col items-center justify-center text-center px-4 mb-8">
@@ -352,9 +366,35 @@ export default function Home() {
             ) : (
               <>
                 <p className="text-center text-muted-foreground">
-                  Authenticated! You can now manage the link.
+                  Authenticated! You can now update the URL for{' '}
+                  <span className="font-bold text-primary">{slugToManage}</span>.
                 </p>
-                {/* The problematic form has been removed for now. */}
+                 <Form {...updateForm}>
+                  <form onSubmit={updateForm.handleSubmit(onUpdateSubmit)} className="space-y-4">
+                    <FormField
+                      control={updateForm.control}
+                      name="url"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>New Long URL</FormLabel>
+                          <div className="flex items-center gap-2">
+                            <FormControl>
+                              <Input placeholder="https://your-new-long-url.com" {...field} />
+                            </FormControl>
+                            <Button type="button" variant="outline" size="icon" onClick={handlePaste}>
+                              <Clipboard className="h-4 w-4" />
+                              <span className="sr-only">Paste from clipboard</span>
+                            </Button>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full" disabled={isUpdating}>
+                      {isUpdating ? 'Updating...' : 'Update and Save Link'}
+                    </Button>
+                  </form>
+                </Form>
               </>
             )}
           </div>
