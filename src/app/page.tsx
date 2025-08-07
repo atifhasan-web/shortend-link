@@ -51,7 +51,6 @@ export default function Home() {
   const [origin, setOrigin] = useState('');
   const { toast } = useToast();
 
-  // Admin auth state
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [authError, setAuthError] = useState('');
 
@@ -94,18 +93,19 @@ export default function Home() {
   
   function openManageModal(slug: string) {
     setSlugToManage(slug);
-    setIsAdminAuthenticated(false); // Reset auth state on open
+    setIsAdminAuthenticated(false);
     setAuthError('');
     adminAuthForm.reset();
-    updateForm.reset();
+    updateForm.reset({ url: '' });
     setIsManageModalOpen(true);
   }
 
   async function onAdminAuthSubmit(values: z.infer<typeof adminAuthSchema>) {
+    // Hardcoded credentials for simplicity
     if (values.username === 'fahim' && values.password === 'fahim') {
       setIsAdminAuthenticated(true);
       setAuthError('');
-      // Explicitly reset the update form here to ensure it's clean
+      // Explicitly reset the update form here to ensure it's clean for the next step
       updateForm.reset({ url: '' });
     } else {
       setAuthError('Invalid credentials. Only admins can manage links.');
@@ -128,7 +128,6 @@ export default function Home() {
       if (result.success && result.shortUrl) {
         setIsManageModalOpen(false);
         showSuccessModal(result.shortUrl);
-        updateForm.reset();
         toast({
           title: 'Success!',
           description: 'The link has been updated successfully.',
