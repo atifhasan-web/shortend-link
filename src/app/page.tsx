@@ -238,12 +238,13 @@ export default function Home() {
                      <ToastAction
                       altText="See Link"
                       onClick={() => showSuccessModal(values.slug)}
+                      className="bg-white text-black hover:bg-gray-100 hover:text-black"
                     >
                       See Link
                     </ToastAction>
                     <button
                       onClick={() => openManageModal(values.slug, values.url, 'update')}
-                      className="text-sm underline hover:text-foreground/80 text-left cursor-pointer"
+                      className="text-sm underline hover:text-white/80 text-left cursor-pointer"
                     >
                       Manage Link
                     </button>
@@ -261,6 +262,7 @@ export default function Home() {
                 variant="outline"
                 size="sm"
                 onClick={() => showSuccessModal(result.shortUrl!)}
+                 className="bg-white text-black hover:bg-gray-100 hover:text-black"
               >
                 See Link
               </Button>
