@@ -162,20 +162,20 @@ export default function Home() {
               description: (
                 <div className="flex flex-col items-start gap-2">
                   <span>{result.error}</span>
-                  <div className="flex flex-col gap-2 items-start mt-2">
-                    <button
-                      onClick={() => openManageModal(values.slug, values.url)}
-                      className="text-sm underline text-white hover:text-gray-200 text-left cursor-pointer"
-                    >
-                      Manage Link
-                    </button>
-                    <ToastAction
+                  <div className="flex flex-row gap-2 items-center mt-2">
+                     <ToastAction
                       altText="See Link"
                       onClick={() => showSuccessModal(values.slug)}
                       className="bg-white text-black hover:bg-gray-100 hover:text-black"
                     >
                       See Link
                     </ToastAction>
+                    <button
+                      onClick={() => openManageModal(values.slug, values.url)}
+                      className="text-sm underline text-white hover:text-gray-200 text-left cursor-pointer"
+                    >
+                      Manage Link
+                    </button>
                   </div>
                 </div>
               ),
@@ -263,9 +263,9 @@ export default function Home() {
                   <FormItem>
                     <FormLabel>Long URL</FormLabel>
                     <FormControl>
-                      <div className="relative flex items-center">
+                       <div className="flex w-full items-center gap-2">
                         <Input placeholder="https://your-very-long-url.com/goes-here" {...field} />
-                        <Button type="button" size="icon" variant="ghost" className="absolute right-1" onClick={handlePaste}>
+                        <Button type="button" size="icon" variant="ghost" onClick={handlePaste} className="shrink-0">
                           <ClipboardPaste className="h-4 w-4" />
                           <span className="sr-only">Paste from clipboard</span>
                         </Button>
