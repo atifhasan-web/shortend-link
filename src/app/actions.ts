@@ -1,7 +1,7 @@
 'use server';
 
 import * as z from 'zod';
-import { saveLink, updateExistingLink } from '@/lib/db';
+import { saveLink, updateExistingLink, deleteLink as dbDeleteLink } from '@/lib/db';
 
 const formSchema = z.object({
   url: z.string().url(),
@@ -58,3 +58,16 @@ export async function updateLink(slug: string, newUrl: string): Promise<CreateSh
   return { success: true, shortUrl: slug };
 }
 
+type DeleteLinkResult = {
+  success: boolean;
+  error?: string;
+};
+
+export async function deleteLink(slug: string): Promise<DeleteLinkResult> {
+    try {
+        await dbDeleteLink(slug);
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: 'Failed to delete link.' };
+    }
+}

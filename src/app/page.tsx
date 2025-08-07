@@ -22,10 +22,23 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from '@/components/ui/dialog';
-import { createShortLink, updateLink } from './actions';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
+import { createShortLink, updateLink, deleteLink } from './actions';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Link as LinkIcon, Wand2, ClipboardPaste } from 'lucide-react';
+import { Copy, Link as LinkIcon, Wand2, ClipboardPaste, Trash2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ToastAction } from '@/components/ui/toast';
 import { getAllLinks, Link } from '@/lib/db';
@@ -53,6 +66,7 @@ export default function Home() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const { toast } = useToast();
 
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [authError, setAuthError] = useState('');
   const [urlToUpdate, setUrlToUpdate] = useState('');
@@ -110,6 +124,7 @@ export default function Home() {
     // Hardcoded credentials for simplicity
     if (values.username === 'fahim' && values.password === 'fahim') {
       setIsAdminAuthenticated(true);
+      setIsAdmin(true); // Set global admin state
       setAuthError('');
       // Automatically trigger the update
       await handleAutoUpdate();
@@ -144,6 +159,31 @@ export default function Home() {
         description: 'There was a problem with your request.',
       });
        setIsManageModalOpen(false);
+    }
+  }
+  
+  async function handleDeleteLink(slug: string) {
+    try {
+      const result = await deleteLink(slug);
+      if (result.success) {
+        toast({
+          title: "Success!",
+          description: "The link has been removed.",
+        });
+        fetchHistory(); // Refresh the list
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: result.error || "Failed to remove link.",
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Oh no! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
     }
   }
 
@@ -317,6 +357,7 @@ export default function Home() {
                   <TableHead className="text-center">Custom Name</TableHead>
                   <TableHead className="text-center">Short Link</TableHead>
                   <TableHead className="text-center">Original URL</TableHead>
+                   {isAdmin && <TableHead className="text-center">Actions</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -334,6 +375,32 @@ export default function Home() {
                     <TableCell className="max-w-xs truncate">
                       <a href={link.url} target="_blank" rel="noopener noreferrer" className="hover:underline">{link.url}</a>
                     </TableCell>
+                    {isAdmin && (
+                      <TableCell className="text-center">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                             <Button variant="destructive" size="icon">
+                               <Trash2 className="h-4 w-4" />
+                             </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete the
+                                link for <span className="font-bold">{link.slug}</span>.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeleteLink(link.slug)}>
+                                Yes, delete it
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

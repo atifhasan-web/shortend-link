@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, doc, getDoc, setDoc, query, where, getDocs, limit, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, setDoc, query, where, getDocs, limit, updateDoc, deleteDoc } from 'firebase/firestore';
 
 const linksCollection = collection(db, 'links');
 
@@ -113,4 +113,15 @@ export async function getAllLinks(): Promise<Link[]> {
     console.error("Error getting all links: ", error);
     return [];
   }
+}
+
+export async function deleteLink(slug: string): Promise<void> {
+    try {
+        const docRef = doc(db, 'links', slug);
+        await deleteDoc(docRef);
+        console.log(`Deleted link with slug: ${slug}`);
+    } catch (error) {
+        console.error("Error deleting link: ", error);
+        throw error; // Re-throw the error to be handled by the caller
+    }
 }
