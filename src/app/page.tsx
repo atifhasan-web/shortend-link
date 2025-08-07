@@ -144,21 +144,21 @@ export default function Home() {
         showSuccessModal(result.shortUrl);
       } else {
         if (result.error === 'This custom name is already taken.') {
-          toast({
-            variant: 'destructive',
-            title: 'Error',
-            description: (
-              <div>
-                <p>{result.error}</p>
-                <button
-                  onClick={() => openManageModal(values.slug, values.url)}
-                  className="mt-2 text-sm underline text-white hover:text-gray-200"
+            toast({
+              variant: 'destructive',
+              title: 'Error',
+              description: result.error,
+              action: (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => showSuccessModal(values.slug)}
+                  className="bg-white text-black hover:bg-gray-100 hover:text-black"
                 >
-                  Manage this link instead?
-                </button>
-              </div>
-            ),
-          });
+                  See Link
+                </Button>
+              ),
+            });
         } else if (result.error === 'This URL has already been shortened.' && result.shortUrl) {
            toast({
             variant: 'destructive',
