@@ -304,71 +304,77 @@ export default function Home() {
             <DialogTitle className="font-headline text-center">Update Link</DialogTitle>
           </DialogHeader>
           <div className="mt-4 flex flex-col gap-4">
-            <p className="text-center text-muted-foreground">
-              The custom name <span className="font-bold text-primary">{slugToManage}</span> is already taken. You can update the long URL it points to.
-            </p>
-
             {!isAdminAuthenticated ? (
-              <Form {...adminAuthForm}>
-                 {authError && (
-                    <Alert variant="destructive">
-                      <AlertTitle>Authentication Failed</AlertTitle>
-                      <AlertDescription>{authError}</AlertDescription>
-                    </Alert>
-                  )}
-                <form onSubmit={adminAuthForm.handleSubmit(onAdminAuthSubmit)} className="space-y-4">
-                  <FormField
-                    control={adminAuthForm.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Admin Username</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter admin username" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+              <>
+                <p className="text-center text-muted-foreground">
+                  The custom name <span className="font-bold text-primary">{slugToManage}</span> is already taken. Please authenticate to manage it.
+                </p>
+                <Form {...adminAuthForm}>
+                  {authError && (
+                      <Alert variant="destructive">
+                        <AlertTitle>Authentication Failed</AlertTitle>
+                        <AlertDescription>{authError}</AlertDescription>
+                      </Alert>
                     )}
-                  />
-                   <FormField
-                    control={adminAuthForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Admin Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="Enter admin password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full">
-                    Authenticate
-                  </Button>
-                </form>
-              </Form>
+                  <form onSubmit={adminAuthForm.handleSubmit(onAdminAuthSubmit)} className="space-y-4">
+                    <FormField
+                      control={adminAuthForm.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Admin Username</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter admin username" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={adminAuthForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Admin Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="Enter admin password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full">
+                      Authenticate
+                    </Button>
+                  </form>
+                </Form>
+              </>
             ) : (
-              <Form {...updateForm}>
-                <form onSubmit={updateForm.handleSubmit(onUpdateSubmit)} className="space-y-4">
-                  <FormField
-                    control={updateForm.control}
-                    name="url"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>New Long URL</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://your-new-long-url.com/goes-here" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full" disabled={isUpdating}>
-                    {isUpdating ? 'Updating...' : 'Update and Save Link'}
-                  </Button>
-                </form>
-              </Form>
+              <>
+                <p className="text-center text-muted-foreground">
+                  Update the long URL for <span className="font-bold text-primary">{slugToManage}</span>.
+                </p>
+                <Form {...updateForm}>
+                  <form onSubmit={updateForm.handleSubmit(onUpdateSubmit)} className="space-y-4">
+                    <FormField
+                      control={updateForm.control}
+                      name="url"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>New Long URL</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://your-new-long-url.com/goes-here" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full" disabled={isUpdating}>
+                      {isUpdating ? 'Updating...' : 'Update and Save Link'}
+                    </Button>
+                  </form>
+                </Form>
+              </>
             )}
           </div>
         </DialogContent>
