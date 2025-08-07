@@ -120,17 +120,16 @@ export default function Home() {
           toast({
             variant: 'destructive',
             title: 'Error',
-            description: result.error,
-            action: (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openManageModal(values.slug)}
-                className="bg-white text-black hover:bg-gray-100 hover:text-black"
-              >
-                <Edit className="mr-2 h-4 w-4"/>
-                Manage Link
-              </Button>
+            description: (
+              <div>
+                <p>{result.error}</p>
+                <button
+                  onClick={() => openManageModal(values.slug)}
+                  className="mt-2 text-sm underline text-white hover:text-gray-200"
+                >
+                  Manage this link instead?
+                </button>
+              </div>
             ),
           });
         } else if (result.error === 'This URL has already been shortened.' && result.shortUrl) {
