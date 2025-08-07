@@ -314,17 +314,17 @@ export default function Home() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Custom Name</TableHead>
-                  <TableHead className="text-right">Short Link</TableHead>
-                  <TableHead>Original URL</TableHead>
+                  <TableHead className="text-center">Custom Name</TableHead>
+                  <TableHead className="text-center">Short Link</TableHead>
+                  <TableHead className="text-center">Original URL</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {linkHistory.map((link) => (
                   <TableRow key={link.slug}>
                     <TableCell className="font-medium">{link.slug}</TableCell>
-                    <TableCell className="text-right">
-                       <div className="flex items-center justify-end gap-2">
+                    <TableCell>
+                       <div className="flex items-center justify-center gap-2">
                         <a href={`${origin}/${link.slug}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{`${origin}/${link.slug}`}</a>
                         <Button type="button" size="icon" variant="ghost" onClick={() => copyToClipboard(`${origin}/${link.slug}`)}>
                           <Copy className="h-4 w-4" />
