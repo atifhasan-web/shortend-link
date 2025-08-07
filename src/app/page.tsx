@@ -70,14 +70,15 @@ export default function Home() {
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [authError, setAuthError] = useState('');
   const [urlToUpdate, setUrlToUpdate] = useState('');
+  const [actionToPerform, setActionToPerform] = useState<'update' | 'delete' | null>(null);
 
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setOrigin(window.location.origin);
-      // Check for persisted admin state
       if (sessionStorage.getItem('isAdmin') === 'true') {
         setIsAdmin(true);
+        setIsAdminAuthenticated(true);
       }
     }
     fetchHistory();
@@ -112,27 +113,48 @@ export default function Home() {
     setGeneratedLink(`${origin}/${shortUrl}`);
     setIsModalOpen(true);
     form.reset();
-    fetchHistory(); // Refresh history
+    fetchHistory();
   }
   
-  function openManageModal(slug: string, url: string) {
+  function openManageModal(slug: string, url: string, action: 'update' | 'delete') {
     setSlugToManage(slug);
     setUrlToUpdate(url);
-    setIsAdminAuthenticated(false);
+    setActionToPerform(action);
     setAuthError('');
     adminAuthForm.reset();
-    setIsManageModalOpen(true);
+
+    if (isAdminAuthenticated) {
+      if (action === 'update') {
+        handleAutoUpdate();
+      } else {
+        setIsManageModalOpen(true); 
+      }
+    } else {
+      setIsManageModalOpen(true);
+    }
   }
 
   async function onAdminAuthSubmit(values: z.infer<typeof adminAuthSchema>) {
-    // Hardcoded credentials for simplicity
     if (values.username === 'fahim' && values.password === 'fahim') {
       setIsAdminAuthenticated(true);
-      setIsAdmin(true); // Set global admin state
-      sessionStorage.setItem('isAdmin', 'true'); // Persist admin state
+      setIsAdmin(true);
+      sessionStorage.setItem('isAdmin', 'true');
       setAuthError('');
-      // Automatically trigger the update
-      await handleAutoUpdate();
+      
+      if (actionToPerform === 'update') {
+        await handleAutoUpdate();
+      } else if (actionToPerform === 'delete') {
+        setIsManageModalOpen(false);
+        // We need to re-trigger the alert dialog for deletion confirmation
+        // This is a bit tricky, so for now we will just close the auth modal
+        // and the user has to click delete again.
+        toast({
+          title: 'Authenticated!',
+          description: 'Please click the remove button again to confirm deletion.',
+        });
+
+      }
+
     } else {
       setAuthError('Invalid credentials. Only admins can manage links.');
       setIsAdminAuthenticated(false);
@@ -155,7 +177,7 @@ export default function Home() {
           title: 'Error',
           description: result.error || 'Failed to update link.',
         });
-         setIsManageModalOpen(false); // Close modal on failure too
+         setIsManageModalOpen(false);
       }
     } catch (error) {
        toast({
@@ -168,6 +190,11 @@ export default function Home() {
   }
   
   async function handleDeleteLink(slug: string) {
+    if (!isAdminAuthenticated) {
+        openManageModal(slug, '', 'delete');
+        return;
+    }
+    
     try {
       const result = await deleteLink(slug);
       if (result.success) {
@@ -175,7 +202,7 @@ export default function Home() {
           title: "Success!",
           description: "The link has been removed.",
         });
-        fetchHistory(); // Refresh the list
+        fetchHistory();
       } else {
         toast({
           variant: "destructive",
@@ -207,17 +234,16 @@ export default function Home() {
               description: (
                 <div className="flex flex-col items-start gap-2">
                   <span>{result.error}</span>
-                  <div className="flex flex-row items-center justify-between mt-2 w-full">
+                   <div className="flex flex-row items-center justify-between mt-2 w-full">
                      <ToastAction
                       altText="See Link"
                       onClick={() => showSuccessModal(values.slug)}
-                      className="bg-white text-black hover:bg-gray-100 hover:text-black"
                     >
                       See Link
                     </ToastAction>
                     <button
-                      onClick={() => openManageModal(values.slug, values.url)}
-                      className="text-sm underline text-white hover:text-gray-200 text-left cursor-pointer"
+                      onClick={() => openManageModal(values.slug, values.url, 'update')}
+                      className="text-sm underline hover:text-foreground/80 text-left cursor-pointer"
                     >
                       Manage Link
                     </button>
@@ -235,7 +261,6 @@ export default function Home() {
                 variant="outline"
                 size="sm"
                 onClick={() => showSuccessModal(result.shortUrl!)}
-                className="bg-white text-black hover:bg-gray-100 hover:text-black"
               >
                 See Link
               </Button>
@@ -362,7 +387,7 @@ export default function Home() {
                   <TableHead className="text-center">Custom Name</TableHead>
                   <TableHead className="text-center">Short Link</TableHead>
                   <TableHead className="text-center">Original URL</TableHead>
-                   {isAdmin && <TableHead className="text-center">Actions</TableHead>}
+                  <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -380,32 +405,35 @@ export default function Home() {
                     <TableCell className="max-w-xs truncate">
                       <a href={link.url} target="_blank" rel="noopener noreferrer" className="hover:underline">{link.url}</a>
                     </TableCell>
-                    {isAdmin && (
-                      <TableCell className="text-center">
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                             <Button variant="destructive" size="icon">
-                               <Trash2 className="h-4 w-4" />
-                             </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete the
-                                link for <span className="font-bold">{link.slug}</span>.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleDeleteLink(link.slug)}>
-                                Yes, delete it
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </TableCell>
-                    )}
+                    <TableCell className="text-center">
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="icon" onClick={(e) => {
+                                if (!isAdminAuthenticated) {
+                                    e.preventDefault();
+                                    openManageModal(link.slug, link.url, 'delete');
+                                }
+                            }}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the
+                              link for <span className="font-bold">{link.slug}</span>.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteLink(link.slug)}>
+                              Yes, delete it
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -442,17 +470,27 @@ export default function Home() {
         </DialogContent>
       </Dialog>
       
-      {/* Manage Name Modal */}
+      {/* Manage/Auth Modal */}
       <Dialog open={isManageModalOpen} onOpenChange={setIsManageModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-headline text-center">Manage Link</DialogTitle>
+            <DialogTitle className="font-headline text-center">
+              {actionToPerform === 'update' ? 'Manage Link' : 'Admin Authentication'}
+            </DialogTitle>
           </DialogHeader>
           <div className="mt-4 flex flex-col gap-4">
-              {!isAdminAuthenticated ? (
+              {isAdminAuthenticated && actionToPerform === 'update' ? (
+                 <div className="flex flex-col items-center justify-center text-center p-4">
+                    <div className="w-12 h-12 border-4 border-primary border-solid border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <p className="text-lg text-muted-foreground">Authentication successful. Updating link...</p>
+                </div>
+              ) : (
                 <>
                   <p className="text-center text-muted-foreground">
-                    The custom name <span className="font-bold text-primary">{slugToManage}</span> is already taken. Please authenticate to update the URL it points to.
+                    {actionToPerform === 'update' 
+                      ? <>The custom name <span className="font-bold text-primary">{slugToManage}</span> is already taken. Please authenticate to update the URL it points to.</>
+                      : 'Please authenticate to proceed with deleting the link.'
+                    }
                   </p>
                   <Form {...adminAuthForm}>
                     {authError && (
@@ -489,16 +527,11 @@ export default function Home() {
                         )}
                       />
                       <Button type="submit" className="w-full">
-                       Authenticate and Update
+                       {actionToPerform === 'update' ? 'Authenticate and Update' : 'Authenticate'}
                       </Button>
                     </form>
                   </Form>
                 </>
-              ) : (
-                <div className="flex flex-col items-center justify-center text-center p-4">
-                    <div className="w-12 h-12 border-4 border-primary border-solid border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p className="text-lg text-muted-foreground">Authentication successful. Updating link...</p>
-                </div>
               )}
           </div>
         </DialogContent>
