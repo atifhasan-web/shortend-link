@@ -3,6 +3,11 @@ import { collection, doc, getDoc, setDoc, query, where, getDocs, limit, updateDo
 
 const linksCollection = collection(db, 'links');
 
+export type Link = {
+  slug: string;
+  url: string;
+};
+
 type SaveLinkResult = {
   success: boolean;
   error?: string;
@@ -92,5 +97,20 @@ export async function getLink(slug: string): Promise<string | null> {
   } catch (error) {
     console.error("Error getting link: ", error);
     return null;
+  }
+}
+
+export async function getAllLinks(): Promise<Link[]> {
+  try {
+    const querySnapshot = await getDocs(linksCollection);
+    const links: Link[] = [];
+    querySnapshot.forEach((doc) => {
+      links.push({ slug: doc.id, ...doc.data() } as Link);
+    });
+    console.log(`Retrieved ${links.length} links.`);
+    return links.sort((a, b) => a.slug.localeCompare(b.slug)); // Sort alphabetically by slug
+  } catch (error) {
+    console.error("Error getting all links: ", error);
+    return [];
   }
 }
