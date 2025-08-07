@@ -373,7 +373,7 @@ export default function Home() {
       <Card className="shadow-lg mt-8">
         <CardHeader>
           <CardTitle className="font-headline text-2xl text-center">Link History</CardTitle>
-          <CardDescription className="text-center">A list of all your created links.</CardDescription>
+          <CardDescription className="text-center">A list of created links in this app.</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoadingHistory ? (
